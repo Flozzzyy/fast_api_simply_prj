@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 import sys
 import os
@@ -30,4 +31,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(tasks_router) 
+app.include_router(tasks_router)
+
+@app.get("/")
+async def read_root():
+    try:
+        return FileResponse("public/index.html")
+    except:
+        return {"message": "Task Manager API is running"} 
