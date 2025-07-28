@@ -28,3 +28,16 @@ class TaskRepository:
                 "description": task_model.description
             }) for task_model in task_models]
             return task_schemas
+
+    @classmethod
+    async def delete_one(cls, task_id: int) -> bool:
+        async with new_session() as session:
+            query = select(TaskOrm).where(TaskOrm.id == task_id)
+            result = await session.execute(query)
+            task = result.scalar_one_or_none()
+            
+            if task:
+                await session.delete(task)
+                await session.commit()
+                return True
+            return False
