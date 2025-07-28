@@ -1,15 +1,11 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from contextlib import asynccontextmanager
-import sys
-import os
 
-# Добавляем текущую директорию в путь
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from contextlib import asynccontextmanager
 
 from database import create_tables, delete_tables
 from router import router as tasks_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -20,22 +16,16 @@ async def lifespan(app: FastAPI):
     yield
     print("Выключение")
 
+
 app = FastAPI(lifespan=lifespan)
 
 # Добавляем CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # Разрешаем все источники
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # Разрешаем все методы
+    allow_headers=["*"],  # Разрешаем все заголовки
 )
 
 app.include_router(tasks_router)
-
-@app.get("/")
-async def read_root():
-    try:
-        return FileResponse("public/index.html")
-    except:
-        return {"message": "Task Manager API is running"} 
